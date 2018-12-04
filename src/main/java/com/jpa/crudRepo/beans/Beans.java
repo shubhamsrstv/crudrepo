@@ -5,7 +5,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name="banking")
+@Table(name = "banking")
 public class Beans 
 {
 	@Column(name="account_number")

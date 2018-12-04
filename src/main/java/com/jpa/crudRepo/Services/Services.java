@@ -2,7 +2,6 @@ package com.jpa.crudRepo.Services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +17,10 @@ public class Services
 	
 	Beans beans = new Beans();
 
-	@SuppressWarnings("resource")
-	public void deleteAccount() {
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter deleting details : ");
-		System.out.println("Account Number : ");
-		beans.setAccountNumber(sc.nextLong());
+	public void deleteAccount(long accountNumber) {
 		Beans result = null;
 		try {
-		result = dao.findById(beans.getAccountNumber()).get();
+		result = dao.findById(accountNumber).get();
 		}
 		catch(Exception e)
 		{
@@ -34,7 +28,7 @@ public class Services
 		}
 		if(result!=null)
 		{
-		dao.deleteById(beans.getAccountNumber());
+		dao.deleteById(accountNumber);
 		}
 		else
 		{
@@ -42,16 +36,7 @@ public class Services
 		}
 	}
 
-	@SuppressWarnings("resource")
-	public void transferAmount() {
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter transfer details : ");
-		System.out.println("First Account Number : ");
-		Long account1 = sc.nextLong();
-		System.out.println("Second Account Number : ");
-		Long account2 = sc.nextLong();
-		System.out.println("Amount : ");
-		float amount = sc.nextFloat();
+	public List<Beans> transferAmount(long account1,long account2, float amount) {
 		Beans result = null;
 		Beans result2 = null;
 		try {
@@ -89,6 +74,7 @@ public class Services
 				/*dao.save(result);
 				dao.save(result2);*/
 				dao.saveAll(results);
+				return results;
 			}
 			
 		}}
@@ -101,19 +87,13 @@ public class Services
 		{
 			System.out.println("First Account number not valid!");
 		}
+		return null;
 	}
-
-	@SuppressWarnings("resource")
-	public void withdrawAmount() {
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter withdraw details : ");
-		System.out.println("Account Number : ");
-		beans.setAccountNumber(sc.nextLong());
-		System.out.println("Amount : ");
-		float amount = sc.nextFloat();
+	
+	public Beans withdrawAmount(long accountNumber, float amount) {
 		Beans result = null;
 		try {
-		result = dao.findById(beans.getAccountNumber()).get();
+		result = dao.findById(accountNumber).get();
 		}
 		catch(Exception e)
 		{
@@ -126,35 +106,23 @@ public class Services
 			System.out.println("Wrong amount");
 		}
 		else {
-			if(amount>result.getAmount())
-			{
-				System.out.println("Transaction not possible");
-			}
-			else {
-				result.setAmount(result.getAmount()-amount);
-				
-				dao.save(result);
-			}
-			
+			result.setAmount(result.getAmount()-amount);
+			dao.save(result);
+			return result;
 		}
 		}
 		else
 		{
 			System.out.println("Account number not valid!");
 		}
+		return null;
 	}
 
-	@SuppressWarnings("resource")
-	public void depositAmount() {
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter deposit details : ");
-		System.out.println("Account Number : ");
-		beans.setAccountNumber(sc.nextLong());
-		System.out.println("Amount : ");
-		float amount = sc.nextFloat();
+
+	public Beans depositAmount(long accountNumber, float amount) {
 		Beans result = null;
 		try {
-		result = dao.findById(beans.getAccountNumber()).get();
+		result = dao.findById(accountNumber).get();
 		}
 		catch(Exception e)
 		{
@@ -169,32 +137,57 @@ public class Services
 		else {
 			result.setAmount(result.getAmount()+amount);
 			dao.save(result);
+			return result;
 		}
 		}
 		else
 		{
 			System.out.println("Account number not valid!");
 		}
+		return null;
 	}
+	
 
-	@SuppressWarnings("resource")
-	public void createAccount() {
-		Scanner sc = new Scanner(System.in);
-		System.out.println("Enter customer details : ");
-		System.out.println("Name : ");
-		beans.setName(sc.nextLine());
-		System.out.println("Aadhar Card : ");
-		beans.setAadharCard(sc.nextLong());
-		System.out.println("Mobile number : ");
-		beans.setMobile(sc.nextLong());
+	public Beans createAccount(Beans bean) {
+		Beans beans = new Beans();
+
+		beans.setAadharCard(bean.getAadharCard());
+		beans.setMobile(bean.getMobile());
+		beans.setName(bean.getName());
 		Beans result = dao.findByAadhar(beans.getAadharCard());
 		if(result==null) {
-			System.out.println(beans.toString());
 		dao.save(beans);
+		return beans;
 		}
 		else {
 			System.out.println("Aadhar card is not unique");
 		}
+		return null;
+	}
+	
+
+	public void deleteAllAccount() {
+		dao.deleteAll();
+		System.out.println("All entity deleted.");
 	}
 
+	public Beans details(long accountNumber) {
+		Beans result = null;
+		try {
+			result = dao.findById(accountNumber).get();
+			}
+			catch(Exception e)
+			{
+				System.out.println(e.getMessage());
+			}
+			if(result!=null)
+			{
+				return result;
+			}
+			else {
+				System.out.println("No matching account found.");
+			}
+		return null;
+		
+	}
 }
